@@ -1,0 +1,22 @@
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Copiar lista de dependencias
+COPY requirements.txt /app/
+
+# Instalar dependencias de Python
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
+
+# Copiar el resto del proyecto (app.py, modelos .pkl, CSV, etc.)
+COPY . /app/
+
+# Puerto donde corre Dash
+EXPOSE 8050
+
+# Comando de inicio (Gunicorn sirve el servidor de Dash)
+CMD ["gunicorn", "app:server", "--bind", "0.0.0.0:8050", "--workers", "2"]
